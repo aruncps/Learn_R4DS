@@ -1,9 +1,12 @@
 ---
 title: "Learn R4DS"
-author: "Arunkumar Shanmugasundaram (from [book](https://r4ds.had.co.nz/index.html) by Hadley & Garrett)"
-date: "30/04/2021"
 output: html_document
 ---
+* **Author:** Arunkumar Shanmugasundaram (from [book](https://r4ds.had.co.nz/index.html) by Hadley & Garrett)
+* **Date:** `r format(Sys.time()-10000, '%d %B, %Y')`
+* **Notable Links:**
+  + [ggplot2 provides over 40 geoms, and extension packages provide even more](https://exts.ggplot2.tidyverse.org/gallery/)
+  + [best way to get a comprehensive overview is the ggplot2 cheatsheet](https://www.rstudio.com/resources/cheatsheets/)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -11,36 +14,168 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ---
 
-### 01-Introduction
-![](https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png)
-
-* **Import**: First you must import your data into R.
-* **Tidy**: Tidying your data means storing it in a consistent form that matches the semantics of the dataset with the way it is stored. In brief, when your data is tidy, each column is a variable, and each row is an observation. 
-* **Transform**: Transformation includes narrowing in on observations of interest (like all people in one city, or all data from the last year), creating new variables that are functions of existing variables (like computing speed from distance and time), and calculating a set of summary statistics (like counts or means).
-* **Wrangling**: Together, tidying and transforming are called wrangling, because getting your data in a form that’s natural to work with often feels like a fight!
-* Two main engines of **knowledge generation**:
-  + **Visualisation**: is a fundamentally human activity. Does not scale well as it requires a human to interpret.
-  + **Modelling**: are complementary tools to visualisation. Works well when the questions are precisely defined. Scales well, as not human involvement.
-* **Communication**: Last and the most critical step.
-* **Programming**: Cuts across all aspects of the project.  
-  
-#### Importing Packages
-```{r packages, results="hide"}
-# install.packages(c("tidyverse","nycflights13", "gapminder", "Lahman"))
-lapply(c("tidyverse","nycflights13", "gapminder", "Lahman"), require, character.only = TRUE)
-```
-
+## Table of Contents: {#toc}
+  + [01-Introduction](#anchor10)
+    + [Importing Packages](#anchor11)
+  + [02-Explore](#anchor20)
+  + [03-Data Visualization](#anchor30)
+    + [Graphing](#anchor31)
+    + [Facets](#anchor32)
+    + [Geom objects](#anchor33)
+    
 ---
 
-## Explore
-### 02-Introduction
+### 01-Introduction  {#anchor10}
+
+![](https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png)
+
+-   **Import**: First you must import your data into R.
+
+-   **Tidy**: Tidying your data means storing it in a consistent form that matches the semantics of the dataset with the way it is stored. In brief, when your data is tidy, each column is a variable, and each row is an observation.
+
+-   **Transform**: Transformation includes narrowing in on observations of interest (like all people in one city, or all data from the last year), creating new variables that are functions of existing variables (like computing speed from distance and time), and calculating a set of summary statistics (like counts or means).
+
+-   **Wrangling**: Together, tidying and transforming are called wrangling, because getting your data in a form that's natural to work with often feels like a fight!
+
+-   Two main engines of **knowledge generation**:
+
+    -   **Visualisation**: is a fundamentally human activity. Does not scale well as it requires a human to interpret.
+    -   **Modelling**: are complementary tools to visualisation. Works well when the questions are precisely defined. Scales well, as not human involvement.
+
+-   **Communication**: Last and the most critical step.
+
+-   **Programming**: Cuts across all aspects of the project.
+
+#### Importing Packages  {#anchor11}
+
+```{r packages, results="hide"}
+# install.packages(c("tidyverse","nycflights13", "gapminder", "Lahman"))
+lapply(c("tidyverse","nycflights13", "gapminder", "Lahman"), library, character.only = TRUE)
+```
+
+------------------------------------------------------------------------
+
+## 02-Explore {#anchor20}
+
+### Introduction
+
 ![](https://d33wubrfki0l68.cloudfront.net/795c039ba2520455d833b4034befc8cf360a70ba/558a5/diagrams/data-science-explore.png)
 
 Lets explore some useful tools that have an immediate payoff:
 
-* **Visualisation**
-* **Transformation**
-* **Data Exploration** - curiosity and scepticism to ask and answer interesting questions about data
+-   **Visualisation**
+-   **Transformation**
+-   **Data Exploration** - curiosity and scepticism to ask and answer interesting questions about data
 
----
+------------------------------------------------------------------------
 
+### 03-Data Visualization {#anchor30}
+
+#### First Steps
+
+Using example dataset from ggplot2 on Cars, lets try to answer the following questions
+
+-   Do cars with big engines use more fuel than cars with small engines?
+
+-   What does the relationship between engine size and fuel efficiency look like?
+
+    -   Is it positive? Negative? Linear? Nonlinear?
+
+```{r}
+mpg
+```
+
+#### Graphing {#anchor31}
+
+##### Plot \# 1: displ vs hwy
+
+-   *displ* - engine displacement, in litres (engine size)
+-   *hwy* - highway miles per gallon (car's efficiency)
+
+```{r displ_vs_hwy, message=FALSE, warning=FALSE, paged.print=FALSE}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_point(mapping = aes(x=displ,y=hwy)) +
+  geom_smooth(method = "lm", se = TRUE, level=0.95)
+```
+
+> plot shows negative relationship between engine size (displ) and efficiency (hwy)
+
+##### Plot \# 2: cyl vs hwy
+
+-   *displ* - engine displacement, in litres (engine size)
+-   *hwy* - highway miles per gallon (car's efficiency)
+
+```{r hwy_vs_cyl, message=FALSE, warning=FALSE, paged.print=FALSE}
+ggplot(data=mpg, aes(x=hwy,y=cyl)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, level=0.95)
+```
+
+> plot shows negative relationship between \# of cylinders (cyl) and efficiency (hwy)
+
+##### Plot \# 3: OMG!! 2 seaters have a differentiated mileage
+
+-   Mix and match color with size, shape and alpha
+
+```{r}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_point(mapping = aes(x=displ,y=hwy,color=class)) +
+  geom_smooth(method = "lm", se = TRUE, level=0.95)
+```
+
+##### Plot \# 4: Conditional coloring
+
+```{r}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_point(mapping = aes(x=displ,y=hwy,color=displ<5)) +
+  geom_smooth(method = "lm", se = TRUE, level=0.95)
+```
+
+#### Facets {#anchor32}
+
+##### Plot \# 5: by Class
+
+Clear view of the class variable. But the linear regression gave more insight than the facets.
+
+```{r}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_point(mapping = aes(x=displ,y=hwy,color=displ<5)) +
+  facet_wrap(~class, nrow = 2)
+```
+
+##### Plot \# 5: drv \~ cyl
+
+```{r}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_point(mapping = aes(x=displ,y=hwy,color=hwy<25)) +
+  facet_grid(cyl~drv)
+```
+
+#### Geom objects {#anchor33}
+
+##### Plot \# 6 - GEOM_SMOOTH
+
+```{r warning=FALSE, message=FALSE}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_smooth(mapping = aes(x=displ,y=hwy))
+```
+
+##### Plot \# 7 - GEOM_POINT
+
+```{r warning=FALSE, message=FALSE}
+ggplot(data=mpg, aes(x=displ,y=hwy)) +
+  geom_point(mapping = aes(x=displ,y=hwy))
+```
+
+##### Plot \# 8 - GEOM_SMOOTH with Linetype
+```{r warning=FALSE, message=FALSE}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
+```
+
+
+##### Plot \# 9 - Multiple geoms in the same plot
+```{r warning=FALSE, message=FALSE}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
+```
