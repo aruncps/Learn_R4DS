@@ -22,6 +22,10 @@ knitr::opts_chunk$set(echo = TRUE)
     + [Graphing](#anchor31)
     + [Facets](#anchor32)
     + [Geom objects](#anchor33)
+    + [Statistical transformations](#anchor34)
+    + [Position adjustments](#anchor35)
+    + [Coordinate systems](#anchor36)
+    + [The layered grammar of graphics](#anchor37)
     
 ---
 
@@ -48,7 +52,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### Importing Packages  {#anchor11}
 
-```{r packages, results="hide"}
+```{r packages, results="hide", warning=FALSE, message=FALSE}
 # install.packages(c("tidyverse","nycflights13", "gapminder", "Lahman"))
 lapply(c("tidyverse","nycflights13", "gapminder", "Lahman"), library, character.only = TRUE)
 ```
@@ -179,3 +183,140 @@ ggplot(data = mpg) +
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
 ```
+
+##### Plot \# 10 - display different aesthetics in different layers
+```{r warning=FALSE, message=FALSE}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class)) + 
+  geom_smooth()
+```
+
+#### Statistical transformations {#anchor34}
+
+##### The figure below describes how this process works with geom_bar()
+
+![](https://d33wubrfki0l68.cloudfront.net/70a3b18a1128c785d8676a48c005ee9b6a23cc00/7283c/images/visualization-stat-bar.png)
+
+##### Plot 11 - default stat is count
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, y= stat(prop) , group=1))
+```
+
+##### Plot 12 - default stat changed from count to other
+```{r warning=FALSE, message=FALSE}
+demo <- tribble(
+  ~cut,         ~freq,
+  "Fair",       1610,
+  "Good",       4906,
+  "Very Good",  12082,
+  "Premium",    13791,
+  "Ideal",      21551
+)
+
+ggplot(data = demo) +
+  geom_bar(mapping = aes(x = cut, y = freq), stat = "identity")
+```
+
+##### Plot 13 - stat_summary
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  stat_summary(
+    mapping = aes(x = cut, y = depth),
+    fun.min = min,
+    fun.max = max,
+    fun = median
+  )
+```
+
+#### Position adjustments  {#anchor35}
+
+##### Plot 14 - color
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, colour = cut))
+```
+
+##### Plot 15 - fill
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = cut))
+```
+
+
+##### Plot 16 - clarity
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+```
+
+##### Plot 17 - 100 perc stacked - position fill
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+```
+
+##### Plot 18 - position dodge
+```{r warning=FALSE, message=FALSE}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+```
+
+
+##### Plot 19 - position jitter
+```{r warning=FALSE, message=FALSE}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
+```
+
+#### Coordinate systems {#anchor36}
+
+##### Plot 20 - coord_flip()
+```{r warning=FALSE, message=FALSE}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+  geom_boxplot()
+```
+```{r warning=FALSE, message=FALSE}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+  geom_boxplot() +
+  coord_flip()
+```
+
+##### Plot 21 - coord_quickmap()
+
+```{r warning=FALSE, message=FALSE}
+nz <- map_data("nz")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black")
+```
+
+```{r warning=FALSE, message=FALSE}
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black") +
+  coord_quickmap()
+```
+
+
+##### Plot 22 - coord_polar()
+```{r warning=FALSE, message=FALSE}
+bar <- ggplot(data = diamonds) + 
+  geom_bar(
+    mapping = aes(x = cut, fill = cut), 
+    show.legend = FALSE,
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+bar + coord_flip()
+```
+
+```{r warning=FALSE, message=FALSE}
+bar + coord_polar()
+```
+
+#### The layered grammar of graphics {#anchor37}
+![](https://d33wubrfki0l68.cloudfront.net/d0509055ae83fd3fdac92d03642441386e382f39/6f4ff/images/visualization-grammar-1.png)
+![](https://d33wubrfki0l68.cloudfront.net/1893b4624cb3eacb925eba80868e3e1023fc2855/09d50/images/visualization-grammar-2.png)
+![](https://d33wubrfki0l68.cloudfront.net/368a11a4f4e801c251ed1835643a0dfa85a3e2b7/1323b/images/visualization-grammar-3.png)
